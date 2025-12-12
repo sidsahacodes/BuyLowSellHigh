@@ -1,75 +1,67 @@
 # Buy Low, Sell High — Intraday Mean Reversion Strategy
 
-This project implements and evaluates an intraday **mean-reversion trading strategy** using hourly equity data.  
-The strategy identifies short-term price deviations from a moving average and generates **long, short, or hold** signals.
+This project explores an intraday **mean-reversion trading strategy** using hourly equity data.  
+The strategy is based on the intuition that prices tend to revert toward a recent average after short-term deviations.
+
+The goal of the project is not to find a single optimal rule, but to understand **how strategy performance depends on parameter choices** and how those choices vary across assets.
 
 ---
 
-## Strategy Overview
+## Strategy Intuition
 
-At each timestamp, we compute the **percentage deviation** of the current price from its rolling moving average:
+At each point in time, the strategy compares the current price to a recent moving average:
 
-PercentageDeviation_t = (Close_t - MA_t) / MA_t
+- If the price is **significantly below** its recent average, the strategy enters a **long** position.
+- If the price is **significantly above** its recent average, the strategy enters a **short** position.
+- If the price is close to its average, the strategy **holds** no position.
 
-Where:
-- Close_t = closing price at time t
-- MA_t = rolling moving average of Close over the last `lookback` periods
-
----
-
-## Trading Rules
-
-Let `tau` (τ) be the deviation threshold.
-
-1. **Long (+1)** if:  
-   PercentageDeviation_t < -tau
-
-2. **Short (-1)** if:  
-   PercentageDeviation_t >  tau
-
-3. **Hold (0)** if:  
-   -tau <= PercentageDeviation_t <= tau
+This allows the strategy to take **long, short, or neutral** positions depending on market conditions.
 
 ---
 
 ## Backtesting Framework
 
-The backtester simulates:
-- Position changes based on generated signals  
-- Hourly returns and cumulative equity  
+A custom backtesting engine simulates:
+- Signal generation at each hourly timestamp  
+- Position changes and portfolio returns  
 - A buy-and-hold benchmark for comparison  
 
-Metrics reported:
-- Final equity  
+Key performance metrics include:
+- Final portfolio value  
 - Sharpe ratio  
 - Maximum drawdown  
 - Number of trades  
 
 ---
 
-## Parameter Grid Search
+## Parameter Sensitivity Analysis
 
-We evaluate the strategy across a grid of:
-- **Lookback windows** (short and medium horizons)
-- **Thresholds (tau)** controlling sensitivity to deviations
+The strategy is evaluated across a grid of:
+- **Lookback windows** (how far back the moving average is computed)
+- **Deviation thresholds** (how large a deviation must be to trigger a trade)
 
 Results are visualized using:
-- Equity curve comparisons vs buy-and-hold
-- Heatmaps of final equity, Sharpe ratio, and trade frequency
+- Equity curve comparisons
+- Heatmaps showing how performance varies across parameters
 
 ---
 
 ## Assets Analyzed
 
-The analysis is run independently for:
+The analysis is conducted independently for:
 - AAPL
 - MSFT
 - AMZN
+
+This highlights how the same strategy behaves differently across assets with distinct volatility and intraday dynamics.
 
 ---
 
 ## Key Findings
 
-- Optimal parameters are **not consistent across different stocks**
-- Small changes in lookback or tau can materially change outcomes
-- Robust performance is best identified by **stable regions** in the heatmaps, not single “best” parameter points
+- Optimal parameters are **asset-specific**
+- Small parameter changes can lead to large differences in performance
+- Robust performance appears in **regions** of the parameter space rather than at a single optimal point
+
+These results emphasize the importance of robustness and adaptation when designing short-horizon trading strategies.
+
